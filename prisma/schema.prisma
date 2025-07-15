@@ -13,8 +13,40 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Role {
+  USER
+  ADMIN
+}
+
 model User {
-  id       Int    @id @default(autoincrement())
-  email    String @unique
-  password String
+  id                 Int       @id @default(autoincrement())
+  email              String    @unique
+  password           String
+  role               Role      @default(USER)
+  isEmailVerified    Boolean   @default(false)
+  emailVerificationToken String?
+  twoFactorCode      String?
+  twoFactorExpiry    DateTime?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+  
+  // Relation avec les films
+  movies             Movie[]
+}
+
+model Movie {
+  id          Int      @id @default(autoincrement())
+  title       String
+  director    String?
+  releaseYear Int?
+  genre       String?
+  rating      Float?
+  notes       String?
+  watchedAt   DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relation avec l'utilisateur
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

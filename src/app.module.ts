@@ -6,6 +6,8 @@ import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PrismaService } from './prisma.service';
+import { AuthModule } from './auth/auth.module';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -20,7 +22,7 @@ import { PrismaService } from './prisma.service';
         secure: false,
       },
       defaults: {
-        from: '"TP machine" <tp@machine.com>',
+        from: '"Watchlist App" <noreply@watchlist.com>',
       },
       template: {
         dir: process.cwd() + '/src/templates',
@@ -30,6 +32,8 @@ import { PrismaService } from './prisma.service';
         },
       },
     }),
+    AuthModule,
+    UsersModule,
   ],
   controllers: [AppController],
   providers: [AppService, PrismaService],

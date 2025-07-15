@@ -13,8 +13,8 @@ async function bootstrap() {
   );
 
   const config = new DocumentBuilder()
-    .setTitle('TP machine')
-    .setDescription('TP machine API')
+    .setTitle('Watchlist App')
+    .setDescription('API for managing movie watchlists with authentication')
     .setVersion('1.0')
     .addBearerAuth()
     .build();
