@@ -8,7 +8,7 @@ import { randomBytes } from 'crypto';
 export class UsersService {
   constructor(private prisma: PrismaService) {}
 
-  async create(email: string, password: string): Promise<User> {
+  async create(email: string, password: string, role: Role = Role.USER): Promise<User> {
     const existingUser = await this.findByEmail(email);
     if (existingUser) {
       throw new ConflictException('User already exists');
@@ -22,7 +22,7 @@ export class UsersService {
         email,
         password: hashedPassword,
         emailVerificationToken,
-        role: Role.USER,
+        role,
       },
     });
   }
@@ -103,5 +103,9 @@ export class UsersService {
 
   async validatePassword(user: User, password: string): Promise<boolean> {
     return bcrypt.compare(password, user.password);
+  }
+
+  async createAdmin(email: string, password: string): Promise<User> {
+    return this.create(email, password, Role.ADMIN);
   }
 }

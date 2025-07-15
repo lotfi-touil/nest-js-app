@@ -1,4 +1,5 @@
 import { Injectable, UnauthorizedException, BadRequestException } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 import { MailerService } from '@nestjs-modules/mailer';
 import { User } from '@prisma/client';
@@ -8,6 +9,7 @@ export class AuthService {
   constructor(
     private usersService: UsersService,
     private mailerService: MailerService,
+    private jwtService: JwtService,
   ) {}
 
   async register(email: string, password: string): Promise<{ message: string }> {
@@ -47,7 +49,7 @@ export class AuthService {
     return { message: 'Login successful. Please check your email for the 2FA code.' };
   }
 
-  async verify2FA(email: string, code: string): Promise<{ message: string; user: Partial<User> }> {
+  async verify2FA(email: string, code: string): Promise<{ message: string; user: Partial<User>; accessToken: string }> {
     const user = await this.usersService.findByEmail(email);
     
     if (!user) {
@@ -59,6 +61,10 @@ export class AuthService {
       throw new UnauthorizedException('Invalid or expired 2FA code');
     }
 
+    // Generate JWT token
+    const payload = { sub: user.id, email: user.email, role: user.role };
+    const accessToken = this.jwtService.sign(payload);
+
     return {
       message: 'Authentication successful',
       user: {
@@ -67,6 +73,7 @@ export class AuthService {
         role: user.role,
         isEmailVerified: user.isEmailVerified,
       },
+      accessToken,
     };
   }
 
